@@ -760,7 +760,7 @@
 // ============================================================
 // 설정 - Google Apps Script 웹앱 URL을 여기에 입력하세요
 // ============================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxU2vC-37uwM0zuxj092Evc78-kxu963DLsD35wqi5HthJ6hSzhLxottvTtlqlmsqnIxA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2ne4A3fubj8az7thAGuMVSVZM-QTzfNyXSkHbgSRJWWdUK7PT0K5birEEA1J7iztebw/exec';
 
 const CLASS_LIST = [
   { id: 'mon',        name: '월요반',            time: '17:30~19:00', day: '월', dayIndex: 1 },
@@ -826,19 +826,10 @@ function getNearestDate(classId) {
 // ============================================================
 // API 호출
 // ============================================================
-async function apiGet(action, date) {
-  const url = `${APPS_SCRIPT_URL}?action=${action}&date=${date}`;
+async function apiGet(action, params = {}) {
+  const query = new URLSearchParams({ action, ...params }).toString();
+  const url = `${APPS_SCRIPT_URL}?${query}`;
   const res = await fetch(url);
-  return await res.json();
-}
-
-async function apiPost(body) {
-  const res = await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    mode: 'cors'
-  });
   return await res.json();
 }
 
@@ -924,7 +915,7 @@ async function loadStatus(date, classId) {
 
   if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
     try {
-      const res = await apiGet('getStatus', date);
+      const res = await apiGet('getStatus', { date });
       if (res.success) {
         allClasses = res.data;
         isOnline = true;
@@ -1041,7 +1032,7 @@ async function doRegister(classId, date) {
   let result;
 
   if (isOnline) {
-    try { result = await apiPost({ action: 'register', classId, studentName, date }); }
+    try { result = await apiGet('register', { classId, studentName, date }); }
     catch(e) { result = { success: false, message: '서버 연결 실패. 잠시 후 다시 시도하세요.' }; }
   } else {
     const key = `${classId}|${date}`;
