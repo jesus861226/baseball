@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>야구학교 취미반 보강 신청</title>
+<title>김광림야구학교 취미반 보강수업 신청</title>
 <link href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" rel="stylesheet">
 <style>
   :root {
@@ -84,19 +84,18 @@
 
   .header-title h1 {
     font-family: 'Paperlogy', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     color: var(--white);
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     line-height: 1.1;
     font-weight: 800;
   }
   .header-title span {
     font-family: 'Paperlogy', sans-serif;
-    font-size: 0.78rem;
+    font-size: 0.92rem;
     color: var(--gold);
-    font-weight: 400;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
   }
 
   /* ─── DATE PICKER ─── */
@@ -686,8 +685,8 @@
   <div class="header-inner">
     <div class="logo-ball"></div>
     <div class="header-title">
-      <h1>야구학교 취미반</h1>
-      <span>보강 신청 시스템</span>
+      <h1>김광림야구학교 취미반</h1>
+      <span>보강수업 신청 페이지</span>
     </div>
   </div>
 </header>
@@ -711,7 +710,7 @@
 
 <!-- Step 2: 수업 반 선택 -->
 <div class="date-section" style="margin-top:24px;">
-  <label>② 내가 다니는 수업반 선택</label>
+  <label>② 보강 신청할 수업반 선택</label>
   <div class="class-select-grid" id="classSelectGrid">
     <!-- Rendered by JS -->
   </div>
@@ -992,7 +991,7 @@ function renderClasses(classes, date, activeClassId) {
            <button class="reg-btn" onclick="doRegister('${cls.id}','${date}')">신청</button>
          </div>`;
 
-    const selectedMark = isSelected ? `<div class="my-class-tag">내 수업반</div>` : '';
+    const selectedMark = isSelected ? `<div class="my-class-tag">보강 신청할 수업반</div>` : '';
 
     card.innerHTML = `
       ${selectedMark}
