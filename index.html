@@ -2,8 +2,15 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>김광림야구학교 취미반 보강수업 신청</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="보강신청">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" rel="stylesheet">
 <style>
   :root {
@@ -759,7 +766,7 @@
 // ============================================================
 // 설정 - Google Apps Script 웹앱 URL을 여기에 입력하세요
 // ============================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyVkS8eqGY6vjgjKT-pRgB4XCt3-xuYNA-RA336QP4wkX-ppGig7sssvb7yYTCTN7v0tQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybyCwV2sHoWvyT373JlCn7deqmrSDztZhdlOQtJU77CVhe7yk0vmk2QjN0AIt7In0wWQ/exec';
 
 const CLASS_LIST = [
   { id: 'mon',        name: '월요반',            time: '17:30~19:00', day: '월', dayIndex: 1 },
@@ -781,8 +788,37 @@ let localCapacity = {};
 CLASS_LIST.forEach(c => localCapacity[c.id] = 3);
 
 let selectedDate = '';
-let selectedClassId = null; // 선택된 수업반 ID
+let selectedClassId = null;
 let isOnline = false;
+
+// ============================================================
+// 프리페치 캐시 (로딩 속도 개선)
+// ============================================================
+const prefetchCache = {}; // { 'YYYY-MM-DD': { data, timestamp } }
+const CACHE_TTL = 30000;  // 30초 캐시 유효
+
+async function prefetchStatus(date) {
+  // 이미 캐시 있고 유효하면 스킵
+  if (prefetchCache[date] && Date.now() - prefetchCache[date].timestamp < CACHE_TTL) return;
+  try {
+    const res = await apiGet('getStatus', { date });
+    if (res.success) {
+      prefetchCache[date] = { data: res.data, timestamp: Date.now() };
+      res.data.forEach(c => { localCapacity[c.id] = c.maxCapacity; });
+    }
+  } catch(e) { /* 백그라운드 실패는 무시 */ }
+}
+
+function prefetchNearDates(baseDate) {
+  // 오늘 포함 앞뒤 7일 미리 로드
+  const base = new Date(baseDate + 'T00:00:00');
+  for (let i = 0; i <= 7; i++) {
+    const d = new Date(base);
+    d.setDate(base.getDate() + i);
+    const str = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    setTimeout(() => prefetchStatus(str), i * 300); // 300ms 간격으로 분산 요청
+  }
+}
 
 // ============================================================
 // 날짜 유틸
@@ -914,14 +950,24 @@ async function loadStatus(date, classId) {
 
   if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
     try {
-      const res = await apiGet('getStatus', { date });
-      if (res.success) {
-        allClasses = res.data;
-        // 서버의 maxCapacity를 localCapacity에 동기화
+      // ✅ 캐시 확인 먼저 (프리페치된 데이터 있으면 즉시 사용)
+      const cached = prefetchCache[date];
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        allClasses = cached.data;
         allClasses.forEach(c => { localCapacity[c.id] = c.maxCapacity; });
         isOnline = true;
         document.getElementById('offlineBanner').style.display = 'none';
-      } else throw new Error(res.message);
+      } else {
+        // 캐시 없으면 서버 요청
+        const res = await apiGet('getStatus', { date });
+        if (res.success) {
+          allClasses = res.data;
+          allClasses.forEach(c => { localCapacity[c.id] = c.maxCapacity; });
+          prefetchCache[date] = { data: res.data, timestamp: Date.now() };
+          isOnline = true;
+          document.getElementById('offlineBanner').style.display = 'none';
+        } else throw new Error(res.message);
+      }
     } catch(e) {
       isOnline = false;
       allClasses = buildLocalStatus(date);
@@ -1056,6 +1102,8 @@ async function doRegister(classId, date) {
 
   if (result.success) {
     const d = result.data;
+    // 캐시 무효화 (신청 후 최신 데이터 반영)
+    delete prefetchCache[date];
     document.getElementById('modalTitle').textContent = '신청 완료! ⚾';
     document.getElementById('modalBody').innerHTML =
       `<strong>${d.studentName}</strong> 학생의<br><strong>${d.className}</strong> 보강 신청이 완료되었습니다.<br><br>📅 날짜: ${d.date}<br>⏰ 시간: ${d.time}`;
@@ -1153,11 +1201,18 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDayBadge(today);
   showLoading(false);
 
+  // ✅ 페이지 로드 즉시 백그라운드 프리페치 시작 (워밍업 + 데이터 미리 로드)
+  if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
+    setTimeout(() => prefetchNearDates(today), 500);
+  }
+
   // 날짜 변경 이벤트
   dp.addEventListener('change', async () => {
     selectedDate = dp.value;
     updateDayBadge(selectedDate);
     updateDateHint(selectedDate, selectedClassId);
+    // ✅ 날짜 변경 시 주변 날짜도 미리 프리페치
+    prefetchNearDates(selectedDate);
     if (selectedClassId) await loadStatus(selectedDate, selectedClassId);
   });
 
@@ -1168,6 +1223,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/baseball/sw.js')
+        .then(reg => console.log('SW 등록 성공:', reg.scope))
+        .catch(err => console.log('SW 등록 실패:', err));
+    });
+  }
 </script>
 </body>
 </html>
