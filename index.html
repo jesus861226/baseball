@@ -312,6 +312,42 @@
     padding: 10px 0 2px;
   }
 
+  /* ─── 보강 미운영 카드 ─── */
+  .class-card.no-makeup {
+    border-color: rgba(255,193,7,0.35);
+    background: linear-gradient(180deg, rgba(255,193,7,0.04) 0%, rgba(255,255,255,1) 60%);
+  }
+  .class-card.no-makeup::before {
+    background: #f59e0b;
+  }
+  .status-pill.no-makeup-pill {
+    background: rgba(255,193,7,0.12);
+    color: #b45309;
+    border: 1px solid rgba(245,158,11,0.5);
+  }
+  .no-makeup-msg {
+    text-align: center;
+    color: #92400e;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.55;
+    padding: 18px 14px;
+    margin-top: 12px;
+    background: rgba(255,193,7,0.08);
+    border: 1px dashed rgba(245,158,11,0.45);
+    border-radius: 12px;
+  }
+  .no-makeup-msg strong {
+    color: #b45309;
+  }
+  .no-makeup-msg small {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #78716c;
+  }
+
   /* ─── TOAST ─── */
   #toast {
     position: fixed;
@@ -777,7 +813,7 @@ const CLASS_LIST = [
   { id: 'sat_junior', name: '토요 주니어 중등반',  time: '10:00~12:00', day: '토', dayIndex: 6 },
   { id: 'sat_low',    name: '토요일 저학년반',    time: '13:30~15:00', day: '토', dayIndex: 6 },
   { id: 'sat_high',   name: '토요일 고학년반',    time: '15:00~16:30', day: '토', dayIndex: 6 },
-  { id: 'sun',        name: '일요반 (백현야구장 야외수업)', time: '16:30~18:30', day: '일', dayIndex: 0 },
+  { id: 'sun',        name: '일요반 (백현야구장 야외수업)', time: '16:30~18:30', day: '일', dayIndex: 0, noMakeup: true },
 ];
 
 const DAY_NAMES = ['일','월','화','수','목','금','토'];
@@ -786,7 +822,6 @@ const DAY_NAMES = ['일','월','화','수','목','금','토'];
 let localData = {};
 let localCapacity = {};
 CLASS_LIST.forEach(c => localCapacity[c.id] = 3);
-localCapacity['sun'] = 0; // 일요반 보강 인원 0명
 
 let selectedDate = '';
 let selectedClassId = null;
@@ -1014,9 +1049,34 @@ function renderClasses(classes, date, activeClassId) {
 
   classes.forEach((cls, i) => {
     const isSelected = cls.id === activeClassId;
+    // CLASS_LIST에서 noMakeup 플래그 가져오기 (서버 데이터에는 없을 수 있으므로)
+    const classMeta = CLASS_LIST.find(c => c.id === cls.id);
+    const isNoMakeup = classMeta?.noMakeup === true;
+
     const card = document.createElement('div');
-    card.className = `class-card ${cls.isFull ? 'full' : ''} ${isSelected ? 'selected-class' : ''}`;
+    card.className = `class-card ${cls.isFull ? 'full' : ''} ${isSelected ? 'selected-class' : ''} ${isNoMakeup ? 'no-makeup' : ''}`;
     card.style.animationDelay = `${i * 0.07}s`;
+
+    // 보강 미운영 반은 안내 메시지 카드로 렌더링
+    if (isNoMakeup) {
+      const selectedMark = isSelected ? `<div class="my-class-tag">보강 신청할 수업반</div>` : '';
+      card.innerHTML = `
+        ${selectedMark}
+        <div class="card-top">
+          <div>
+            <div class="class-name">${cls.name}</div>
+            <div class="class-time">⏰ ${cls.time}</div>
+          </div>
+          <div class="status-pill no-makeup-pill">보강 미운영</div>
+        </div>
+        <div class="no-makeup-msg">
+          ⚠️ 일요반은 <strong>타반 학생의 보강 신청을 받지 않습니다.</strong><br>
+          <small>일요반 학생의 결석 시 보강은 평일반에서 가능합니다.</small>
+        </div>
+      `;
+      grid.appendChild(card);
+      return;
+    }
 
     let slotsHtml = '';
     for (let s = 0; s < cls.maxCapacity; s++) {
@@ -1071,6 +1131,13 @@ function renderClasses(classes, date, activeClassId) {
 // 보강 신청
 // ============================================================
 async function doRegister(classId, date) {
+  // 보강 미운영 반 차단 (안전장치)
+  const classMeta = CLASS_LIST.find(c => c.id === classId);
+  if (classMeta?.noMakeup) {
+    showToast('해당 반은 보강 신청을 받지 않습니다.', true);
+    return;
+  }
+
   const input = document.getElementById(`name_${classId}`);
   const studentName = input.value.trim();
   if (!studentName) { showToast('학생 이름을 입력해주세요.', true); input.focus(); return; }
