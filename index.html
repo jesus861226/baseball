@@ -172,6 +172,42 @@
     color: var(--green);
     font-weight: 700;
   }
+  /* 🆕 수업 시간표 영역 */
+  .venue-schedule {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(244,162,97,0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .venue-card.changed .venue-schedule {
+    border-top-color: rgba(45,198,83,0.3);
+  }
+  .venue-schedule-item {
+    font-size: 0.85rem;
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.3px;
+  }
+  .venue-schedule-item .sched-icon {
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .venue-schedule-item .sched-class {
+    color: var(--white);
+    font-weight: 600;
+    min-width: 0;
+  }
+  .venue-schedule-item .sched-dot {
+    color: var(--gray);
+  }
+  .venue-schedule-item .sched-time {
+    color: var(--gray);
+    letter-spacing: 0.5px;
+  }
   .venue-badge {
     background: rgba(45,198,83,0.18);
     color: var(--green);
@@ -1064,7 +1100,7 @@
 // ============================================================
 // 설정 - Google Apps Script 웹앱 URL
 // ============================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvC1P2DH05vzGcBk_BqE1TBoGNWlz8oQlTrUuR5EMfI9lYXrbgsYJOYcPmQvwDy4UfrA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybyCwV2sHoWvyT373JlCn7deqmrSDztZhdlOQtJU77CVhe7yk0vmk2QjN0AIt7In0wWQ/exec';
 
 const CLASS_LIST = [
   { id: 'mon',        name: '월요반 (백현야구장 야외수업)', time: '17:30~19:00', day: '월', dayIndex: 1 },
@@ -1217,6 +1253,28 @@ function renderTodayVenue() {
   const info = getVenueForDate(today);
   const dayName = getDayName(today);
   const md = today.slice(5).replace('-', '/');
+  const todayDayIdx = getDayIndex(today);
+
+  // 🆕 오늘 요일에 해당하는 모든 반의 시간표 생성
+  const todayClasses = CLASS_LIST.filter(c => c.dayIndex === todayDayIdx);
+  const scheduleHtml = todayClasses.length > 0
+    ? `
+      <div class="venue-schedule">
+        ${todayClasses.map(c => {
+          // 반 이름에서 "(백현야구장 야외수업)" 같은 부가 설명 제거 → 간결하게
+          const cleanName = c.name.replace(/\s*\(.*?\)\s*/g, '').trim();
+          return `
+            <div class="venue-schedule-item">
+              <span class="sched-icon">⏰</span>
+              <span class="sched-class">${cleanName}</span>
+              <span class="sched-dot">·</span>
+              <span class="sched-time">${c.time}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `
+    : '';
 
   container.innerHTML = `
     <div class="venue-card ${info.isChanged ? 'changed' : ''}">
@@ -1230,6 +1288,7 @@ function renderTodayVenue() {
             ${info.reason ? ` · 사유: ${info.reason}` : ''}
           </div>
         ` : ''}
+        ${scheduleHtml}
       </div>
       ${info.isChanged ? '<div class="venue-badge">변경됨</div>' : ''}
     </div>
