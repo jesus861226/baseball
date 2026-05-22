@@ -105,6 +105,86 @@
     letter-spacing: 1px;
   }
 
+  /* 🆕 ─── 장소 공지 영역 ─── */
+  .venue-notice {
+    max-width: 1100px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+  }
+  .venue-card {
+    background: linear-gradient(145deg, rgba(244,162,97,0.08), rgba(244,162,97,0.02));
+    border: 1.5px solid rgba(244,162,97,0.35);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s both;
+  }
+  .venue-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, var(--gold), var(--red));
+  }
+  .venue-card.changed {
+    background: linear-gradient(145deg, rgba(45,198,83,0.10), rgba(45,198,83,0.02));
+    border-color: rgba(45,198,83,0.45);
+  }
+  .venue-card.changed::before {
+    background: linear-gradient(180deg, var(--green), #1a9c40);
+  }
+  .venue-emoji {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+  .venue-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .venue-label {
+    font-size: 0.72rem;
+    color: var(--gold);
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+  }
+  .venue-card.changed .venue-label {
+    color: var(--green);
+  }
+  .venue-place {
+    font-size: 1.1rem;
+    color: var(--white);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .venue-reason {
+    font-size: 0.78rem;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+  .venue-reason strong {
+    color: var(--green);
+    font-weight: 700;
+  }
+  .venue-badge {
+    background: rgba(45,198,83,0.18);
+    color: var(--green);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(45,198,83,0.4);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
   /* ─── DATE PICKER ─── */
   .date-section {
     max-width: 1100px;
@@ -268,6 +348,14 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+  }
+
+  .reg-hint {
+    font-size: 0.72rem;
+    color: var(--gray);
+    text-align: center;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
   }
 
   .name-input {
@@ -450,6 +538,8 @@
     padding: 0 20px 16px;
     display: flex;
     justify-content: flex-end;
+    gap: 18px;
+    flex-wrap: wrap;
   }
   .admin-link {
     color: var(--gray);
@@ -489,7 +579,7 @@
     width: 90%;
     transform: scale(0.9);
     transition: transform 0.25s cubic-bezier(.21,1.2,.5,1);
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
   }
   .modal-overlay.show .config-modal { transform: scale(1); }
@@ -555,6 +645,128 @@
   }
   .config-cancel-btn:hover { border-color: var(--gray); }
 
+  /* 🆕 ─── 장소 공지 관리 모달 전용 ─── */
+  .venue-form-group {
+    margin-bottom: 18px;
+  }
+  .venue-form-label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .venue-form-input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: var(--white);
+    font-family: 'Paperlogy', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .venue-form-input:focus { border-color: var(--gold); }
+  .venue-form-input::placeholder { color: rgba(255,255,255,0.25); }
+
+  .venue-radio-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .venue-radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    color: var(--cream);
+    font-weight: 600;
+  }
+  .venue-radio:has(input:checked) {
+    background: rgba(244,162,97,0.12);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .venue-radio input { cursor: pointer; accent-color: var(--gold); }
+
+  .venue-list-section {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .venue-list-title {
+    font-size: 0.88rem;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  .venue-admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .venue-admin-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    font-size: 0.85rem;
+  }
+  .venue-admin-item-info {
+    flex: 1;
+    color: var(--cream);
+    line-height: 1.4;
+  }
+  .venue-admin-item-date {
+    font-weight: 700;
+    color: var(--white);
+    margin-right: 8px;
+  }
+  .venue-admin-item-place {
+    color: var(--green);
+    font-weight: 600;
+  }
+  .venue-admin-item-reason {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--gray);
+    margin-top: 3px;
+  }
+  .venue-admin-delete {
+    background: rgba(230,57,70,0.15);
+    color: var(--red);
+    border: 1px solid rgba(230,57,70,0.4);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Paperlogy', sans-serif;
+    transition: all 0.2s;
+  }
+  .venue-admin-delete:hover { background: rgba(230,57,70,0.3); }
+  .venue-admin-empty {
+    text-align: center;
+    color: var(--gray);
+    font-size: 0.8rem;
+    padding: 18px;
+  }
+
   /* ─── OFFLINE MODE BANNER ─── */
   .offline-banner {
     background: rgba(230,57,70,0.12);
@@ -572,6 +784,9 @@
   @media (max-width: 600px) {
     .header-title h1 { font-size: 1.15rem; }
     .classes-grid { grid-template-columns: 1fr; }
+    .venue-card { padding: 14px 16px; gap: 12px; }
+    .venue-place { font-size: 1rem; }
+    .venue-emoji { font-size: 1.7rem; }
   }
 
   /* ─── STEP UI ─── */
@@ -688,7 +903,6 @@
   }
   .class-select-btn.active .check-icon { display: flex; }
 
-  /* ─── SELECTED CLASS TAG & SAME-DAY INFO ─── */
   .my-class-tag {
     display: inline-block;
     background: linear-gradient(90deg, var(--gold), #e08c40);
@@ -734,6 +948,11 @@
   </div>
 </header>
 
+<!-- 🆕 장소 공지 영역 (오늘 수업 장소) -->
+<div class="venue-notice" id="venueNotice">
+  <!-- Rendered by JS -->
+</div>
+
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner">
   ⚠ 데모 모드로 동작 중입니다. Google Apps Script URL 설정 후 실제 데이터와 연동됩니다.
@@ -771,6 +990,7 @@
 
 <!-- Admin Link -->
 <div class="admin-section">
+  <span class="admin-link" onclick="openVenueAdmin()">📍 관리자: 수업 장소 공지</span>
   <span class="admin-link" onclick="openAdminConfig()">⚙ 관리자: 보강 인원 설정</span>
 </div>
 
@@ -795,12 +1015,54 @@
   </div>
 </div>
 
+<!-- 🆕 장소 공지 관리 모달 -->
+<div class="modal-overlay" id="venueAdminModal">
+  <div class="config-modal">
+    <h2>📍 수업 장소 공지 관리</h2>
+    <p class="config-subtitle">우천·시설 사정 등으로 장소 변경 시 공지를 등록하세요.</p>
+
+    <div class="venue-form-group">
+      <label class="venue-form-label">📅 날짜</label>
+      <input type="date" id="venueAdminDate" class="venue-form-input">
+    </div>
+
+    <div class="venue-form-group">
+      <label class="venue-form-label">🏟 수업 장소</label>
+      <div class="venue-radio-group">
+        <label class="venue-radio">
+          <input type="radio" name="venueChoice" value="outdoor">
+          <span>⚾ 야외 (백현야구장)</span>
+        </label>
+        <label class="venue-radio">
+          <input type="radio" name="venueChoice" value="indoor">
+          <span>🏠 실내 (야구학교)</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="venue-form-group">
+      <label class="venue-form-label">📝 사유 (선택)</label>
+      <input type="text" id="venueAdminReason" class="venue-form-input" placeholder="예: 우천 예정, 시설 점검 등" maxlength="30">
+    </div>
+
+    <button class="config-save-btn" onclick="saveVenueNotice()">공지 등록</button>
+    <button class="config-cancel-btn" onclick="closeModal('venueAdminModal')">취소</button>
+
+    <div class="venue-list-section">
+      <div class="venue-list-title">📋 등록된 공지 (오늘 이후)</div>
+      <div id="venueAdminList" class="venue-admin-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
 <script>
 // ============================================================
-// 설정 - Google Apps Script 웹앱 URL을 여기에 입력하세요
+// 설정 - Google Apps Script 웹앱 URL
 // ============================================================
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbybyCwV2sHoWvyT373JlCn7deqmrSDztZhdlOQtJU77CVhe7yk0vmk2QjN0AIt7In0wWQ/exec';
 
@@ -827,14 +1089,16 @@ let selectedDate = '';
 let selectedClassId = null;
 let isOnline = false;
 
+// 🆕 장소 공지 캐시
+let venueNoticesCache = [];
+
 // ============================================================
 // 프리페치 캐시 (로딩 속도 개선)
 // ============================================================
-const prefetchCache = {}; // { 'YYYY-MM-DD': { data, timestamp } }
-const CACHE_TTL = 30000;  // 30초 캐시 유효
+const prefetchCache = {};
+const CACHE_TTL = 30000;
 
 async function prefetchStatus(date) {
-  // 이미 캐시 있고 유효하면 스킵
   if (prefetchCache[date] && Date.now() - prefetchCache[date].timestamp < CACHE_TTL) return;
   try {
     const res = await apiGet('getStatus', { date });
@@ -842,17 +1106,16 @@ async function prefetchStatus(date) {
       prefetchCache[date] = { data: res.data, timestamp: Date.now() };
       res.data.forEach(c => { localCapacity[c.id] = c.maxCapacity; });
     }
-  } catch(e) { /* 백그라운드 실패는 무시 */ }
+  } catch(e) {}
 }
 
 function prefetchNearDates(baseDate) {
-  // 오늘 포함 앞뒤 7일 미리 로드
   const base = new Date(baseDate + 'T00:00:00');
   for (let i = 0; i <= 7; i++) {
     const d = new Date(base);
     d.setDate(base.getDate() + i);
     const str = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    setTimeout(() => prefetchStatus(str), i * 300); // 300ms 간격으로 분산 요청
+    setTimeout(() => prefetchStatus(str), i * 300);
   }
 }
 
@@ -865,21 +1128,19 @@ function getTodayStr() {
 }
 
 function getDayIndex(dateStr) {
-  return new Date(dateStr + 'T00:00:00').getDay(); // 0=일 ~ 6=토
+  return new Date(dateStr + 'T00:00:00').getDay();
 }
 
 function getDayName(dateStr) {
   return DAY_NAMES[getDayIndex(dateStr)];
 }
 
-// 선택된 반의 요일과 날짜의 요일이 맞는지 확인
 function isMatchingDay(dateStr, classId) {
   const cls = CLASS_LIST.find(c => c.id === classId);
   if (!cls) return false;
   return getDayIndex(dateStr) === cls.dayIndex;
 }
 
-// 선택 반의 요일로부터 가장 가까운 미래 날짜 찾기
 function getNearestDate(classId) {
   const cls = CLASS_LIST.find(c => c.id === classId);
   if (!cls) return getTodayStr();
@@ -888,7 +1149,7 @@ function getNearestDate(classId) {
   const todayDay = today.getDay();
   let diff = cls.dayIndex - todayDay;
   if (diff < 0) diff += 7;
-  if (diff === 0) diff = 7; // 오늘이 같은 요일이면 다음주로
+  if (diff === 0) diff = 7;
   const target = new Date(today);
   target.setDate(today.getDate() + diff);
   return `${target.getFullYear()}-${String(target.getMonth()+1).padStart(2,'0')}-${String(target.getDate()).padStart(2,'0')}`;
@@ -902,6 +1163,172 @@ async function apiGet(action, params = {}) {
   const url = `${APPS_SCRIPT_URL}?${query}`;
   const res = await fetch(url);
   return await res.json();
+}
+
+// ============================================================
+// 🆕 장소 공지 관련 함수
+// ============================================================
+function getDefaultVenueByDate(dateStr) {
+  const dayIdx = getDayIndex(dateStr);
+  // 월(1), 목(4), 일(0) → 야외, 그 외 → 실내
+  if (dayIdx === 0 || dayIdx === 1 || dayIdx === 4) {
+    return { type: 'outdoor', label: '백현야구장 (야외)', emoji: '⚾' };
+  }
+  return { type: 'indoor', label: '야구학교 (실내)', emoji: '🏠' };
+}
+
+function getVenueForDate(dateStr) {
+  const notice = venueNoticesCache.find(n => n.date === dateStr);
+  const defaultVenue = getDefaultVenueByDate(dateStr);
+
+  if (notice) {
+    const noticeLabel = notice.venue === 'outdoor'
+      ? { label: '백현야구장 (야외)', emoji: '⚾' }
+      : { label: '야구학교 (실내)', emoji: '🏠' };
+    const isChanged = notice.venue !== defaultVenue.type;
+    return {
+      ...noticeLabel,
+      type: notice.venue,
+      isChanged,
+      reason: notice.reason || '',
+      defaultLabel: defaultVenue.label
+    };
+  }
+  return { ...defaultVenue, isChanged: false, reason: '' };
+}
+
+async function loadVenueNotices() {
+  try {
+    const res = await apiGet('getVenueNotices');
+    if (res && res.success) {
+      venueNoticesCache = res.data || [];
+    }
+  } catch(e) {
+    venueNoticesCache = [];
+  }
+  renderTodayVenue();
+}
+
+function renderTodayVenue() {
+  const container = document.getElementById('venueNotice');
+  if (!container) return;
+
+  const today = getTodayStr();
+  const info = getVenueForDate(today);
+  const dayName = getDayName(today);
+  const md = today.slice(5).replace('-', '/');
+
+  container.innerHTML = `
+    <div class="venue-card ${info.isChanged ? 'changed' : ''}">
+      <div class="venue-emoji">${info.emoji}</div>
+      <div class="venue-info">
+        <div class="venue-label">${info.isChanged ? '오늘 변경된 수업 장소' : '오늘 수업 장소'} · ${md} (${dayName})</div>
+        <div class="venue-place">${info.label}</div>
+        ${info.isChanged ? `
+          <div class="venue-reason">
+            <strong>기본 장소:</strong> ${info.defaultLabel}
+            ${info.reason ? ` · 사유: ${info.reason}` : ''}
+          </div>
+        ` : ''}
+      </div>
+      ${info.isChanged ? '<div class="venue-badge">변경됨</div>' : ''}
+    </div>
+  `;
+}
+
+// ============================================================
+// 🆕 관리자 - 장소 공지 등록/수정/삭제
+// ============================================================
+async function openVenueAdmin() {
+  document.getElementById('venueAdminDate').value = getTodayStr();
+  document.getElementById('venueAdminReason').value = '';
+  document.querySelectorAll('input[name="venueChoice"]').forEach(r => r.checked = false);
+
+  await loadVenueNotices();
+  renderVenueAdminList();
+
+  document.getElementById('venueAdminModal').classList.add('show');
+}
+
+function renderVenueAdminList() {
+  const listEl = document.getElementById('venueAdminList');
+  if (!listEl) return;
+
+  const today = getTodayStr();
+  const upcoming = venueNoticesCache
+    .filter(n => n.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (upcoming.length === 0) {
+    listEl.innerHTML = `<div class="venue-admin-empty">등록된 공지가 없습니다.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = upcoming.map(n => {
+    const dt = new Date(n.date + 'T00:00:00');
+    const dayName = DAY_NAMES[dt.getDay()];
+    const md = n.date.slice(5).replace('-','/');
+    const venueLabel = n.venue === 'outdoor' ? '⚾ 야외' : '🏠 실내';
+    return `
+      <div class="venue-admin-item">
+        <div class="venue-admin-item-info">
+          <span class="venue-admin-item-date">${md}(${dayName})</span>
+          <span class="venue-admin-item-place">${venueLabel}</span>
+          ${n.reason ? `<span class="venue-admin-item-reason">📝 ${n.reason}</span>` : ''}
+        </div>
+        <button class="venue-admin-delete" onclick="deleteVenueNotice('${n.date}')">삭제</button>
+      </div>
+    `;
+  }).join('');
+}
+
+async function saveVenueNotice() {
+  const date = document.getElementById('venueAdminDate').value;
+  const venue = document.querySelector('input[name="venueChoice"]:checked')?.value;
+  const reason = document.getElementById('venueAdminReason').value.trim();
+
+  if (!date) { showToast('날짜를 선택해주세요.', true); return; }
+  if (!venue) { showToast('장소를 선택해주세요.', true); return; }
+
+  const saveBtn = document.querySelector('#venueAdminModal .config-save-btn');
+  saveBtn.textContent = '저장 중...';
+  saveBtn.disabled = true;
+
+  try {
+    const res = await apiGet('saveVenueNotice', { date, venue, reason });
+    if (res.success) {
+      showToast('✅ 공지가 등록되었습니다.');
+      await loadVenueNotices();
+      renderVenueAdminList();
+      // 폼 초기화
+      document.querySelectorAll('input[name="venueChoice"]').forEach(r => r.checked = false);
+      document.getElementById('venueAdminReason').value = '';
+    } else {
+      showToast(res.message || '등록 실패', true);
+    }
+  } catch(e) {
+    showToast('서버 연결 실패. 다시 시도해주세요.', true);
+  } finally {
+    saveBtn.textContent = '공지 등록';
+    saveBtn.disabled = false;
+  }
+}
+
+async function deleteVenueNotice(date) {
+  if (!confirm(`${date} 공지를 삭제하시겠습니까?`)) return;
+
+  try {
+    const res = await apiGet('deleteVenueNotice', { date });
+    if (res.success) {
+      showToast('✅ 공지가 삭제되었습니다.');
+      await loadVenueNotices();
+      renderVenueAdminList();
+    } else {
+      showToast(res.message || '삭제 실패', true);
+    }
+  } catch(e) {
+    showToast('서버 연결 실패.', true);
+  }
 }
 
 // ============================================================
@@ -921,25 +1348,18 @@ function renderClassSelectGrid() {
   `).join('');
 }
 
-// ============================================================
-// STEP 1 → STEP 2: 반 선택 처리
-// ============================================================
 function selectClass(classId) {
   selectedClassId = classId;
 
-  // Step2 버튼 active 처리
   document.querySelectorAll('.class-select-btn').forEach(btn => btn.classList.remove('active'));
   event.currentTarget.classList.add('active');
 
-  // 날짜 힌트 업데이트
   updateDateHint(selectedDate, classId);
 
-  // 결과 카드 영역 표시 후 로드
   document.getElementById('classesGrid').style.display = 'grid';
   document.getElementById('noticeBar').style.display = 'flex';
   loadStatus(selectedDate, classId);
 
-  // 결과로 스크롤
   setTimeout(() => {
     document.getElementById('classesGrid').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 100);
@@ -954,9 +1374,6 @@ function resetClassSelect() {
   document.getElementById('dateHint').className = 'date-hint';
 }
 
-// ============================================================
-// 날짜 힌트 업데이트
-// ============================================================
 function updateDayBadge(dateStr) {
   if (!dateStr) return;
   const badge = document.getElementById('dayBadge');
@@ -977,16 +1394,12 @@ function updateDateHint(dateStr, classId) {
   }
 }
 
-// ============================================================
-// 현황 로드
-// ============================================================
 async function loadStatus(date, classId) {
   showLoading(true);
   let allClasses;
 
   if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
     try {
-      // ✅ 캐시 확인 먼저 (프리페치된 데이터 있으면 즉시 사용)
       const cached = prefetchCache[date];
       if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
         allClasses = cached.data;
@@ -994,7 +1407,6 @@ async function loadStatus(date, classId) {
         isOnline = true;
         document.getElementById('offlineBanner').style.display = 'none';
       } else {
-        // 캐시 없으면 서버 요청
         const res = await apiGet('getStatus', { date });
         if (res.success) {
           allClasses = res.data;
@@ -1015,7 +1427,6 @@ async function loadStatus(date, classId) {
     document.getElementById('offlineBanner').style.display = 'block';
   }
 
-  // 선택된 반만 필터 (같은 요일의 반들도 함께 표시)
   const cls = CLASS_LIST.find(c => c.id === classId);
   const filtered = cls
     ? allClasses.filter(c => c.id === classId || CLASS_LIST.find(x => x.id === c.id)?.dayIndex === cls.dayIndex)
@@ -1040,16 +1451,12 @@ function buildLocalStatus(date) {
   });
 }
 
-// ============================================================
-// 클래스 카드 렌더링
-// ============================================================
 function renderClasses(classes, date, activeClassId) {
   const grid = document.getElementById('classesGrid');
   grid.innerHTML = '';
 
   classes.forEach((cls, i) => {
     const isSelected = cls.id === activeClassId;
-    // CLASS_LIST에서 noMakeup 플래그 가져오기 (서버 데이터에는 없을 수 있으므로)
     const classMeta = CLASS_LIST.find(c => c.id === cls.id);
     const isNoMakeup = classMeta?.noMakeup === true;
 
@@ -1057,7 +1464,6 @@ function renderClasses(classes, date, activeClassId) {
     card.className = `class-card ${cls.isFull ? 'full' : ''} ${isSelected ? 'selected-class' : ''} ${isNoMakeup ? 'no-makeup' : ''}`;
     card.style.animationDelay = `${i * 0.07}s`;
 
-    // 보강 미운영 반은 안내 메시지 카드로 렌더링
     if (isNoMakeup) {
       const selectedMark = isSelected ? `<div class="my-class-tag">보강 신청할 수업반</div>` : '';
       card.innerHTML = `
@@ -1096,6 +1502,7 @@ function renderClasses(classes, date, activeClassId) {
     const inputHtml = cls.isFull
       ? `<div class="full-msg">🔴 보강 자리가 모두 찼습니다</div>`
       : `<div class="reg-form">
+           <div class="reg-hint">💡 빈자리 클릭 없이 이름만 입력하시면 자동 배정됩니다</div>
            <input type="text" class="name-input" id="name_${cls.id}" placeholder="학생 이름 입력" maxlength="10">
            <button class="reg-btn" onclick="doRegister('${cls.id}','${date}')">신청</button>
          </div>`;
@@ -1118,7 +1525,6 @@ function renderClasses(classes, date, activeClassId) {
     grid.appendChild(card);
   });
 
-  // 같은 요일 반이 여러 개일 때 안내
   if (classes.length > 1) {
     const infoEl = document.createElement('div');
     infoEl.className = 'same-day-info';
@@ -1127,11 +1533,7 @@ function renderClasses(classes, date, activeClassId) {
   }
 }
 
-// ============================================================
-// 보강 신청
-// ============================================================
 async function doRegister(classId, date) {
-  // 보강 미운영 반 차단 (안전장치)
   const classMeta = CLASS_LIST.find(c => c.id === classId);
   if (classMeta?.noMakeup) {
     showToast('해당 반은 보강 신청을 받지 않습니다.', true);
@@ -1170,7 +1572,6 @@ async function doRegister(classId, date) {
 
   if (result.success) {
     const d = result.data;
-    // 캐시 무효화 (신청 후 최신 데이터 반영)
     delete prefetchCache[date];
     document.getElementById('modalTitle').textContent = '신청 완료! ⚾';
     document.getElementById('modalBody').innerHTML =
@@ -1182,22 +1583,17 @@ async function doRegister(classId, date) {
   }
 }
 
-// ============================================================
-// 관리자 설정
-// ============================================================
 async function openAdminConfig() {
   const rows = document.getElementById('configRows');
-  // 로딩 표시
   rows.innerHTML = `<div style="text-align:center;padding:20px;color:var(--gold)">⏳ 서버에서 설정 불러오는 중...</div>`;
   openModal('adminModal');
 
   try {
     const res = await apiGet('getCapacity');
     if (res.success) {
-      // 서버 값으로 localCapacity 동기화
       Object.assign(localCapacity, res.data);
     }
-  } catch(e) { /* 실패시 로컬값 사용 */ }
+  } catch(e) {}
 
   rows.innerHTML = CLASS_LIST.map(c => `
     <div class="config-input-row">
@@ -1215,8 +1611,7 @@ async function saveConfig() {
     localCapacity[c.id] = capacityMap[c.id];
   });
 
-  // 저장 버튼 비활성화
-  const saveBtn = document.querySelector('.config-save-btn');
+  const saveBtn = document.querySelector('#adminModal .config-save-btn');
   saveBtn.textContent = '저장 중...';
   saveBtn.disabled = true;
 
@@ -1235,9 +1630,6 @@ async function saveConfig() {
   if (selectedDate && selectedClassId) await loadStatus(selectedDate, selectedClassId);
 }
 
-// ============================================================
-// UI Helpers
-// ============================================================
 function showLoading(v) {
   const el = document.getElementById('loadingScreen');
   if (v) el.classList.remove('hidden');
@@ -1261,7 +1653,6 @@ function showToast(msg, isError) {
 document.addEventListener('DOMContentLoaded', () => {
   renderClassSelectGrid();
 
-  // 날짜를 오늘로 초기 설정
   const dp = document.getElementById('datePicker');
   const today = getTodayStr();
   dp.value = today;
@@ -1269,22 +1660,21 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDayBadge(today);
   showLoading(false);
 
-  // ✅ 페이지 로드 즉시 백그라운드 프리페치 시작 (워밍업 + 데이터 미리 로드)
+  // 🆕 페이지 로드 시 오늘 수업 장소 표시
+  loadVenueNotices();
+
   if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
     setTimeout(() => prefetchNearDates(today), 500);
   }
 
-  // 날짜 변경 이벤트
   dp.addEventListener('change', async () => {
     selectedDate = dp.value;
     updateDayBadge(selectedDate);
     updateDateHint(selectedDate, selectedClassId);
-    // ✅ 날짜 변경 시 주변 날짜도 미리 프리페치
     prefetchNearDates(selectedDate);
     if (selectedClassId) await loadStatus(selectedDate, selectedClassId);
   });
 
-  // 모달 바깥 클릭으로 닫기
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', e => {
       if (e.target === overlay) overlay.classList.remove('show');
