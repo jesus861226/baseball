@@ -1526,7 +1526,7 @@ function buildLocalStatus(date) {
   return CLASS_LIST.map(c => {
     const key = `${c.id}|${date}`;
     const students = localData[key] || [];
-    const max = localCapacity[c.id] || 3;
+    const max = localCapacity[c.id] ?? 3;
     return {
       id: c.id, name: c.name, time: c.time, day: c.day,
       maxCapacity: max, currentCount: students.length,
@@ -1640,7 +1640,7 @@ async function doRegister(classId, date) {
   } else {
     const key = `${classId}|${date}`;
     const students = localData[key] || [];
-    const max = localCapacity[classId] || 3;
+    const max = localCapacity[classId] ?? 3;
     if (students.length >= max) {
       result = { success: false, message: '보강 자리가 모두 찼습니다.' };
     } else if (students.includes(studentName)) {
@@ -1684,7 +1684,7 @@ async function openAdminConfig() {
   rows.innerHTML = CLASS_LIST.map(c => `
     <div class="config-input-row">
       <div class="config-label">${c.name}<small>${c.time}</small></div>
-      <input type="number" class="config-num" id="cap_${c.id}" value="${localCapacity[c.id] || 3}" min="1" max="20">
+      <input type="number" class="config-num" id="cap_${c.id}" value="${localCapacity[c.id] ?? 3}" min="0" max="20">
     </div>
   `).join('');
 }
@@ -1693,7 +1693,8 @@ async function saveConfig() {
   const capacityMap = {};
   CLASS_LIST.forEach(c => {
     const val = parseInt(document.getElementById(`cap_${c.id}`).value);
-    capacityMap[c.id] = isNaN(val) || val < 1 ? 3 : val;
+    // 빈 값/NaN/음수면 기본값 3, 0 이상은 그대로 (0도 유효 - 보강 미운영)
+    capacityMap[c.id] = (isNaN(val) || val < 0) ? 3 : val;
     localCapacity[c.id] = capacityMap[c.id];
   });
 
