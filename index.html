@@ -568,25 +568,42 @@
   .notice-bar span { color: var(--gold); font-weight: 700; }
 
   /* ─── ADMIN SECTION ─── */
+  /* ─── 🆕 비밀 관리자 아이콘 (야구공 푸터 라인) ─── */
   .admin-section {
     max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 20px 16px;
+    margin: 40px auto 0;
+    padding: 24px 20px 20px;
     display: flex;
-    justify-content: flex-end;
-    gap: 18px;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    border-top: 1px solid rgba(244,162,97,0.08);
     flex-wrap: wrap;
   }
-  .admin-link {
-    color: var(--gray);
-    font-size: 0.75rem;
-    text-decoration: none;
-    letter-spacing: 1px;
-    border-bottom: 1px dashed var(--gray);
-    transition: color 0.2s;
-    cursor: pointer;
+  .deco-ball {
+    font-size: 16px;
+    line-height: 1;
+    opacity: 0.22;
+    filter: grayscale(0.7);
+    user-select: none;
   }
-  .admin-link:hover { color: var(--gold); border-color: var(--gold); }
+  .secret-icon {
+    font-size: 16px;
+    line-height: 1;
+    opacity: 0.22;
+    cursor: pointer;
+    user-select: none;
+    filter: grayscale(0.7);
+    transition: opacity 0.2s, transform 0.2s, filter 0.2s;
+  }
+  .secret-icon:hover {
+    opacity: 1;
+    transform: scale(1.2);
+    filter: grayscale(0);
+  }
+  .secret-icon:active {
+    transform: scale(0.95);
+  }
 
   /* ─── ANIMATIONS ─── */
   @keyframes fadeUp {
@@ -1024,10 +1041,20 @@
   <!-- Rendered by JS -->
 </div>
 
-<!-- Admin Link -->
+<!-- 🆕 비밀 관리자 아이콘 (야구공 푸터 라인) -->
+<!-- 앞 8개는 단순 데코, 맨 오른쪽 2개가 버튼 -->
+<!-- 9번째 야구공 = 장소 공지 / 10번째 야구공 = 인원 설정 -->
 <div class="admin-section">
-  <span class="admin-link" onclick="openVenueAdmin()">📍 관리자: 수업 장소 공지</span>
-  <span class="admin-link" onclick="openAdminConfig()">⚙ 관리자: 보강 인원 설정</span>
+  <span class="deco-ball">⚾</span>
+  <span class="deco-ball">⚾</span>
+  <span class="deco-ball">⚾</span>
+  <span class="deco-ball">⚾</span>
+  <span class="deco-ball">⚾</span>
+  <span class="deco-ball">⚾</span>
+  <span class="deco-ball">⚾</span>
+  <span class="deco-ball">⚾</span>
+  <span class="secret-icon" onclick="openVenueAdmin()" title="">⚾</span>
+  <span class="secret-icon" onclick="openAdminConfig()" title="">⚾</span>
 </div>
 
 <!-- Success Modal -->
