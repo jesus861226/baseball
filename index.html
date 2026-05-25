@@ -892,6 +892,64 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 12px;
+    position: relative;
+  }
+
+  /* 🆕 날짜 미선택 시 비활성화 */
+  .class-select-grid.disabled {
+    pointer-events: none;
+    opacity: 0.35;
+    filter: blur(0.5px) grayscale(0.5);
+    transition: opacity 0.3s, filter 0.3s;
+  }
+
+  /* 🆕 안내 오버레이 */
+  .step2-locked-overlay {
+    display: none;
+    background: linear-gradient(145deg, rgba(244,162,97,0.12), rgba(244,162,97,0.04));
+    border: 1.5px dashed rgba(244,162,97,0.5);
+    border-radius: 14px;
+    padding: 28px 20px;
+    text-align: center;
+    color: var(--gold);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-bottom: 14px;
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
+  .step2-locked-overlay.show {
+    display: block;
+  }
+  .step2-locked-overlay .lock-icon {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .step2-locked-overlay .lock-sub {
+    font-size: 0.78rem;
+    color: var(--gray);
+    font-weight: 500;
+    margin-top: 6px;
+    letter-spacing: 0;
+  }
+
+  /* 🆕 흔들림 애니메이션 (잘못 클릭 시) */
+  @keyframes shake-hint {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  .step2-locked-overlay.shake {
+    animation: shake-hint 0.4s ease-in-out;
+  }
+
+  /* 🆕 부드러운 펄스 (시선 끌기) */
+  @keyframes pulse-soft {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(244,162,97,0); }
+    50% { box-shadow: 0 0 0 4px rgba(244,162,97,0.08); }
   }
 
   .class-select-btn {
@@ -1013,7 +1071,7 @@
 
 <!-- Step 1: 날짜 선택 -->
 <div class="date-section">
-  <label>① 보강 참여할 날짜 선택</label>
+  <label>① 보강/체험 참여할 날짜 선택</label>
   <div class="step2-inner">
     <div class="date-row">
       <input type="date" id="datePicker">
@@ -1025,8 +1083,16 @@
 
 <!-- Step 2: 수업 반 선택 -->
 <div class="date-section" style="margin-top:24px;">
-  <label>② 보강 참여할 수업반 선택</label>
-  <div class="class-select-grid" id="classSelectGrid">
+  <label>② 보강/체험 참여할 수업반 선택</label>
+
+  <!-- 🆕 날짜 미선택 시 안내 -->
+  <div class="step2-locked-overlay" id="step2Locked">
+    <span class="lock-icon">👆</span>
+    먼저 ① 에서 <strong>날짜</strong>를 선택해주세요
+    <div class="lock-sub">날짜를 선택하면 수업반을 선택할 수 있습니다</div>
+  </div>
+
+  <div class="class-select-grid disabled" id="classSelectGrid">
     <!-- Rendered by JS -->
   </div>
 </div>
@@ -1435,6 +1501,12 @@ function renderClassSelectGrid() {
 }
 
 function selectClass(classId) {
+  // 🆕 안전장치: 날짜 미선택 시 차단
+  if (!selectedDate) {
+    shakeLockedHint();
+    return;
+  }
+
   selectedClassId = classId;
 
   document.querySelectorAll('.class-select-btn').forEach(btn => btn.classList.remove('active'));
@@ -1737,29 +1809,57 @@ function showToast(msg, isError) {
 // ============================================================
 // 초기화
 // ============================================================
+// ============================================================
+// 🆕 ② 영역 잠금/해제 함수
+// ============================================================
+function lockStep2() {
+  document.getElementById('classSelectGrid').classList.add('disabled');
+  document.getElementById('step2Locked').classList.add('show');
+}
+
+function unlockStep2() {
+  document.getElementById('classSelectGrid').classList.remove('disabled');
+  document.getElementById('step2Locked').classList.remove('show');
+}
+
+// 🆕 날짜 안 골랐을 때 ② 클릭하면 흔들림 효과
+function shakeLockedHint() {
+  const el = document.getElementById('step2Locked');
+  el.classList.remove('shake');
+  void el.offsetWidth; // 리플로우 강제 → 애니메이션 재시작
+  el.classList.add('shake');
+  // 날짜 입력칸으로 자동 포커스
+  document.getElementById('datePicker').focus();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderClassSelectGrid();
 
   const dp = document.getElementById('datePicker');
-  const today = getTodayStr();
-  dp.value = today;
-  selectedDate = today;
-  updateDayBadge(today);
+  // 🆕 날짜 칸을 비워둠 (학부모가 신중하게 선택하도록 유도)
+  dp.value = '';
+  selectedDate = '';
   showLoading(false);
+
+  // 🆕 ② 영역 초기 잠금
+  lockStep2();
 
   // 🆕 페이지 로드 시 오늘 수업 장소 표시
   loadVenueNotices();
 
-  if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
-    setTimeout(() => prefetchNearDates(today), 500);
-  }
-
   dp.addEventListener('change', async () => {
     selectedDate = dp.value;
-    updateDayBadge(selectedDate);
-    updateDateHint(selectedDate, selectedClassId);
-    prefetchNearDates(selectedDate);
-    if (selectedClassId) await loadStatus(selectedDate, selectedClassId);
+    if (selectedDate) {
+      updateDayBadge(selectedDate);
+      updateDateHint(selectedDate, selectedClassId);
+      prefetchNearDates(selectedDate);
+      unlockStep2();  // 🆕 날짜 고르면 ② 영역 활성화
+      if (selectedClassId) await loadStatus(selectedDate, selectedClassId);
+    } else {
+      // 날짜 비웠을 때 다시 잠금
+      lockStep2();
+      resetClassSelect();
+    }
   });
 
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
