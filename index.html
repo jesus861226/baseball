@@ -150,7 +150,7 @@
     font-size: 0.72rem;
     color: var(--gold);
     letter-spacing: 1px;
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 3px;
     text-transform: uppercase;
   }
@@ -160,7 +160,7 @@
   .venue-place {
     font-size: 1.1rem;
     color: var(--white);
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.5px;
     margin-bottom: 2px;
   }
@@ -171,7 +171,7 @@
   }
   .venue-reason strong {
     color: var(--green);
-    font-weight: 700;
+    font-weight: 500;
   }
   /* 🆕 수업 시간표 영역 */
   .venue-schedule {
@@ -213,7 +213,7 @@
     background: rgba(45,198,83,0.18);
     color: var(--green);
     font-size: 0.68rem;
-    font-weight: 700;
+    font-weight: 500;
     padding: 4px 9px;
     border-radius: 12px;
     letter-spacing: 0.5px;
@@ -234,7 +234,7 @@
     color: var(--gold);
     letter-spacing: 2px;
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 500;
     display: block;
     margin-bottom: 10px;
   }
@@ -257,8 +257,43 @@
     outline: none;
     cursor: pointer;
     transition: border-color 0.2s;
+    min-width: 180px;
   }
   input[type="date"]:focus { border-color: var(--gold); }
+
+  /* 🆕 날짜 입력 래퍼 + 빈 상태 안내 텍스트 */
+  .date-input-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .date-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 18px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--gold);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s;
+    z-index: 1;
+    animation: blink-soft 2.4s ease-in-out infinite;
+  }
+  .date-input-wrapper.has-value .date-placeholder {
+    display: none;
+  }
+  @keyframes blink-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  /* Safari/iOS에서 빈 date input 텍스트 숨기기 */
+  .date-input-wrapper:not(.has-value) input[type="date"]::-webkit-datetime-edit {
+    color: transparent;
+  }
+  .date-input-wrapper.has-value input[type="date"]::-webkit-datetime-edit {
+    color: var(--white);
+  }
 
   .day-badge {
     background: var(--red);
@@ -331,7 +366,7 @@
     padding: 5px 13px;
     border-radius: 20px;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 1px;
     white-space: nowrap;
     flex-shrink: 0;
@@ -432,7 +467,7 @@
     text-align: center;
     color: var(--full-red);
     font-size: 0.82rem;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 1px;
     padding: 10px 0 2px;
   }
@@ -566,7 +601,7 @@
     align-items: center;
     gap: 8px;
   }
-  .notice-bar span { color: var(--gold); font-weight: 700; }
+  .notice-bar span { color: var(--gold); font-weight: 500; }
 
   /* ─── ADMIN SECTION ─── */
   /* ─── 🆕 비밀 관리자 아이콘 (야구공 푸터 라인) ─── */
@@ -707,7 +742,7 @@
     display: block;
     font-size: 0.78rem;
     color: var(--gold);
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 8px;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -761,7 +796,7 @@
   .venue-list-title {
     font-size: 0.88rem;
     color: var(--gold);
-    font-weight: 700;
+    font-weight: 500;
     margin-bottom: 10px;
     letter-spacing: 0.5px;
   }
@@ -787,7 +822,7 @@
     line-height: 1.4;
   }
   .venue-admin-item-date {
-    font-weight: 700;
+    font-weight: 500;
     color: var(--white);
     margin-right: 8px;
   }
@@ -808,7 +843,7 @@
     padding: 5px 10px;
     border-radius: 6px;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 500;
     cursor: pointer;
     font-family: 'Paperlogy', sans-serif;
     transition: all 0.2s;
@@ -1004,7 +1039,7 @@
   .schedule-table thead th {
     background: rgba(244,162,97,0.08);
     color: var(--gold);
-    font-weight: 700;
+    font-weight: 500;
     padding: 9px 12px;
     text-align: left;
     border-bottom: 1px solid rgba(244,162,97,0.2);
@@ -1051,7 +1086,7 @@
     background: rgba(244,162,97,0.12);
     color: var(--gold);
     font-size: 0.68rem;
-    font-weight: 700;
+    font-weight: 500;
     padding: 2px 6px;
     border-radius: 4px;
     margin-left: 4px;
@@ -1271,7 +1306,10 @@
   <label style="margin-top: 24px;">① 보강/체험 참여할 날짜를 선택하세요.</label>
   <div class="step2-inner">
     <div class="date-row">
-      <input type="date" id="datePicker">
+      <div class="date-input-wrapper" id="dateInputWrapper">
+        <span class="date-placeholder">📅 날짜 선택</span>
+        <input type="date" id="datePicker">
+      </div>
       <div class="day-badge" id="dayBadge"></div>
     </div>
     <div class="date-hint" id="dateHint"></div>
@@ -2069,7 +2107,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   dp.addEventListener('change', async () => {
     selectedDate = dp.value;
+    const wrapper = document.getElementById('dateInputWrapper');
     if (selectedDate) {
+      wrapper.classList.add('has-value');  // 🆕 안내 텍스트 숨김
       updateDayBadge(selectedDate);
       // 🆕 날짜 바뀌면 기존 선택 초기화하고 해당 요일 반만 다시 그리기
       selectedClassId = null;
@@ -2080,6 +2120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       prefetchNearDates(selectedDate);
       unlockStep2();  // 🆕 날짜 고르면 ② 영역 활성화
     } else {
+      wrapper.classList.remove('has-value');  // 🆕 안내 텍스트 다시 표시
       // 날짜 비웠을 때 다시 잠금
       lockStep2();
       resetClassSelect();
